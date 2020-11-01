@@ -11,7 +11,7 @@ import helper_functions.pipeline as pipeline
 import helper_functions.preprocessing as preprocess
 
 # lay-out
-st.beta_set_page_config(layout="wide")
+st.set_page_config(layout="wide")
 
 # title
 st.title('Topic and sentiment analyzer')
