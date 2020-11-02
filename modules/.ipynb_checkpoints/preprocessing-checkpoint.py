@@ -1,4 +1,3 @@
-
 import PyPDF2
 import os
 import requests 
@@ -9,9 +8,8 @@ import streamlit as st
 import spacy
 
 
-#@st.cache(show_spinner=False)
-def extract_content(open_pdf_file=None, url=None):
-    
+@st.cache(allow_output_mutation=True, show_spinner=False)
+def extract_content(open_pdf_file=None, url=None):    
     """
     A simple user define function that, given a url or pdf file, downloads PDF text content
     Parse PDF and return plain text version
@@ -31,22 +29,41 @@ def extract_content(open_pdf_file=None, url=None):
     # return concatenated content
     return "\n".join(text)
 
+
 def remove_non_ascii(text):
+    """
+    remove non ascii text
+    """
     printable = set(string.printable)
     return ''.join(filter(lambda x: x in printable, text))
 
+
 def not_header(line):
+    """
+    remove headers
+    """
     # as we're consolidating broken lines into paragraphs, we want to make sure not to include headers
     return not line.isupper()
 
+
+@st.cache(allow_output_mutation=True, show_spinner=False)
 def load_spacy_model(model="en_core_web_sm"):
-    # load spacy model
+    """
+    load spacy model
+    """
+    
     spacy.cli.download(model)
     nlp = spacy.load(model, disable=['ner'])
     return nlp
 
-#@st.cache(show_spinner=False)
-def extract_statements(text=None, nlp=None, make_sentence=False, n_word_paragraph=200):
+
+def extract_statements(
+    text=None, 
+    nlp=None, 
+    make_sentence=False, 
+    n_min_word_paragraph=50, 
+    n_max_word_paragraph=200
+    ):
     """
     Extracting ESG statements from raw text by removing junk, URLs, etc.
     We group consecutive lines into paragraphs and use spacy to parse sentences.
@@ -61,10 +78,16 @@ def extract_statements(text=None, nlp=None, make_sentence=False, n_word_paragrap
     n_words = 0
     for line in text.split('\n'):
         # aggregate consecutive lines where text may be broken down
-        # only if next line starts with a space or previous does not end with punctation mark and smaller than n_word_paragraph
-        if((line.startswith(' ') or not prev.endswith(('.','?', '!'))) and n_words < n_word_paragraph):
+        # only if next line starts with a space or previous does not end with punctation mark and between
+        if((line.startswith(' ') or not prev.endswith(('.','?', '!'))) and n_words <= n_max_word_paragraph):
             prev = prev + ' ' + line
             n_words = len(prev.split())
+        
+        # min words in paragraph
+        elif n_words <=n_min_word_paragraph:
+            prev = prev + ' ' + line
+            n_words = len(prev.split())
+            
         else:
             # new paragraph
             lines.append(prev)
@@ -95,13 +118,14 @@ def extract_statements(text=None, nlp=None, make_sentence=False, n_word_paragrap
             
         # split paragraphs into well defined sentences using spacy
         if make_sentence:
-            # check if nlp model is loaded 
-            if nlp is not None:
+            try:
                 for part in list(nlp(line).sents):
                     part_strip =  str(part).strip()
                     # remove senteces with only 30 characters
                     if len(part_strip) > 30:
                         sentences.append(part_strip)
+            except ValueError:
+                 print("Check if nlp model was loaded")
         else:
             sentences.append(line)
     
