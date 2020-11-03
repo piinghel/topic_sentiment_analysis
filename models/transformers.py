@@ -6,6 +6,7 @@ import re
 import string
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
 
+
 # own modules
 import modules.pipeline as pipeline
 import modules.preprocessing as preprocess
@@ -160,8 +161,10 @@ def format_output(predictions_all, weighted_by_words, n_texts,articles):
         
         # weighted
         if weighted_by_words:
-            out_avg_sent = (pd.DataFrame(predictions_all['Sentiment'].multiply(out_all["nr_words"], axis="index").sum()/out_all["nr_words"].sum(),
-                                         columns=["Confidence %"])*100).sort_values(by="Confidence %",ascending=False).round(3)
+            sent_words = predictions_all['Sentiment'].multiply(out_all["nr_words"], axis="index").sum()
+            sum_words = out_all["nr_words"].sum()
+            out_avg_sent = pd.DataFrame(sent_words / sum_words, columns=["Confidence %"])
+            out_avg_sent = (out_avg_sent * 100).sort_values(by="Confidence %", ascending=False).round(3)
         # simple average
         else:
             out_avg_sent = pd.DataFrame(predictions_all['Sentiment'].mean(), columns=["Confidence (%)"])*100

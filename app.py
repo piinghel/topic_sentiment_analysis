@@ -1,8 +1,6 @@
 import streamlit as st
 from models.transformers import run_transformers
 
-
-
 def main():
     
     st.sidebar.title("Menu")
