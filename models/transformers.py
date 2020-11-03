@@ -21,7 +21,7 @@ def load_global_vars():
     global TOPICS
     global MULTI_TOPICS
     TOPIC_DIR = "joeddav/xlm-roberta-large-xnli"
-    SENTIMENT_DIR = "distilbert-base-uncased-finetuned-sst-2-english"
+    SENTIMENT_DIR = "nlptown/bert-base-multilingual-uncased-sentiment"
     TOPICS = "Environmental, Social, Governance, ESG"
     MULTI_TOPICS = True
 
@@ -101,7 +101,7 @@ def wrapper_preprocess_steps(uploaded_file, text_split):
     return articles
 
 
-@st.cache(allow_output_mutation=False, show_spinner=False)
+#@st.cache(allow_output_mutation=False, show_spinner=False)
 def wrapper_predictions(
     output_topic_dir, 
     output_sent_dir, 

@@ -4,7 +4,7 @@ import streamlit as st
 import numpy as np
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
+#@st.cache(allow_output_mutation=True, show_spinner=False)
 def topic_load_pipeline(directory="facebook/bart-large-mnli"):
     """
     load topic pipeline
@@ -15,7 +15,7 @@ def topic_load_pipeline(directory="facebook/bart-large-mnli"):
     return pipeline("zero-shot-classification", tokenizer=tokenizer, model=model)
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
+#@st.cache(allow_output_mutation=True, show_spinner=False)
 def sentiment_load_pipeline(directory="distilbert-base-uncased-finetuned-sst-2-english", return_all_scores=True):   
     """
     load sentiment pipeline
@@ -26,7 +26,7 @@ def sentiment_load_pipeline(directory="distilbert-base-uncased-finetuned-sst-2-e
     return pipeline("sentiment-analysis", tokenizer=tokenizer, model=model, return_all_scores=return_all_scores)
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
+#@st.cache(allow_output_mutation=True, show_spinner=False)
 def load_pipeline(dir_topic, dir_sent):   
     """
     wrapper for loading topic and sentiment pipeline
