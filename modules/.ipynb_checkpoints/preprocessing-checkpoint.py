@@ -4,12 +4,14 @@ import requests
 import re
 import string
 import io
+import numpy as np
 import streamlit as st
 import spacy
+import gensim
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
-def extract_content(open_pdf_file=None, url=None):    
+#@st.cache(allow_output_mutation=True, show_spinner=False)
+def extract_content(url=None, open_pdf_file=None):    
     """
     A simple user define function that, given a url or pdf file, downloads PDF text content
     Parse PDF and return plain text version
@@ -22,10 +24,13 @@ def extract_content(open_pdf_file=None, url=None):
             open_pdf_file = io.BytesIO(response.content)
             # return concatenated content
         except:
-            return ""
-    pdf = PyPDF2.PdfFileReader(open_pdf_file)  
-    # access pdf content
-    text = [pdf.getPage(i).extractText() for i in range(0, pdf.getNumPages())]
+            return np.nan
+    try:
+        pdf = PyPDF2.PdfFileReader(open_pdf_file)  
+        # access pdf content
+        text = [pdf.getPage(i).extractText() for i in range(0, pdf.getNumPages())]
+    except:
+        return np.nan
     # return concatenated content
     return "\n".join(text)
 
@@ -46,7 +51,7 @@ def not_header(line):
     return not line.isupper()
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
+#@st.cache(allow_output_mutation=True, show_spinner=False)
 def load_spacy_model(model="en_core_web_sm"):
     """
     load spacy model
@@ -130,6 +135,25 @@ def extract_statements(
             sentences.append(line)
     
     return sentences
+
+
+def tokenize(sentence):
+    gen = gensim.utils.simple_preprocess(sentence, deacc=True)
+    return ' '.join(gen)
+
+
+def lemmatize(text, nlp):
+  
+    # parse sentence using spacy
+    doc = nlp(text) 
+
+    # convert words into their simplest form (singular, present form, etc.)
+    lemma = []
+    for token in doc:
+        if (token.lemma_ not in ['-PRON-']):
+            lemma.append(token.lemma_)
+
+    return tokenize(' '.join(lemma))
 
 
    

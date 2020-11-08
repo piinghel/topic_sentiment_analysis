@@ -72,15 +72,9 @@ def predict(topic_pipeline, sentiment_pipeline, doc, topics, multi_topics=True, 
     sent_pred = []
     
     # loop over document
-    # if show_progress:
-    #    max_value = len(doc)
-    #    progress_bar = st.progress(0)
     for i, d in enumerate(doc):
         topic_pred.append(topic_predict(pipeline=topic_pipeline, doc=d, labels=topics, multilabel=multi_topics))
         sent_pred.append(sentiment_predict(pipeline=sentiment_pipeline, doc=d))
-        # if show_progress:
-        #    progress_bar.progress((i+1)/max_value)
-            #print(i)
     
     # return in dictonary format    
     out =  {"Topic":pd.concat(topic_pred).reset_index(drop=True),

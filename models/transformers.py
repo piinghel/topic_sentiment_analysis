@@ -56,13 +56,13 @@ def define_topics(topics, multi_topic):
     return topics, allow_multi_topics
 
 
-def wrapper_preprocess_steps(uploaded_file, text_split):
+def wrapper_preprocess_steps(url_report, text_split):
     """
     wrapper around the preprocessing steps
     """
     
     # read in pdf file
-    text = preprocess.extract_content(open_pdf_file=uploaded_file)
+    text = preprocess.extract_content(open_pdf_file=None, url=url_report)
 
     # process pdf file and split in paragraphs
     if text_split == 'Make paragraphs':
@@ -101,7 +101,7 @@ def wrapper_preprocess_steps(uploaded_file, text_split):
     return articles
 
 
-#@st.cache(allow_output_mutation=False, show_spinner=False)
+@st.cache(allow_output_mutation=False, show_spinner=False)
 def wrapper_predictions(
     output_topic_dir, 
     output_sent_dir, 
@@ -186,10 +186,12 @@ def run_transformers():
     load_global_vars()
     
     # upload file
-    uploaded_file = upload_file()
-    if not isinstance(uploaded_file, st.uploaded_file_manager.UploadedFile):
-        st.error("Select pdf file!")
-        return
+    example = "https://impact.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/documents/jpmc-cr-esg-report-2019.pdf"
+    url_report = st.text_input("Enter url of esg report", example)
+    # uploaded_file = upload_file()
+    # if not isinstance(uploaded_file, st.uploaded_file_manager.UploadedFile):
+    #     st.error("Select pdf file!")
+    #     return
     
     # get topic and sent directroy
     output_topic_dir, output_sent_dir = input_pipeline_dir(topic=TOPIC_DIR, sent=SENTIMENT_DIR)
@@ -221,7 +223,7 @@ def run_transformers():
     )
     
     with st.spinner("Preprocessing data..."):
-        articles = wrapper_preprocess_steps(uploaded_file=uploaded_file, text_split=text_split)
+        articles = wrapper_preprocess_steps(url_report=url_report, text_split=text_split)
 
     with st.beta_expander("Show processed paragraphs"):
             st.write(articles)

@@ -1,8 +1,6 @@
 import streamlit as st
 from models.transformers import run_transformers
-
-
-
+from models.lda import run_lda
 def main():
     
     st.sidebar.title("Menu")
@@ -14,7 +12,7 @@ def main():
         run_transformers()
     
     elif option == "LDA":
-        st.header("TO BE DONE")
+        run_lda()
         
 if __name__ == "__main__":
     st.set_page_config(layout="wide")

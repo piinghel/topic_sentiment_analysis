@@ -4,6 +4,7 @@ import streamlit as st
 import numpy as np
 
 
+
 #@st.cache(allow_output_mutation=True, show_spinner=False)
 def topic_load_pipeline(directory="facebook/bart-large-mnli"):
     """
@@ -42,7 +43,6 @@ def topic_predict(
       doc,
       labels,
       multilabel=True,
-      batch_size=32,
       include_labels=True
     ):
     """
@@ -63,7 +63,8 @@ def sentiment_predict(pipeline, doc):
     pred = pd.DataFrame({list(dic.values())[0]: list(dic.values())[1] for dic in pred[0]}, index=[0])
     return pred
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
+
+#@st.cache(allow_output_mutation=True, show_spinner=False)
 def predict(topic_pipeline, sentiment_pipeline, doc, topics, multi_topics=True, show_progress=True):
     """
     Wrapper for topic and sentiment predictions
